@@ -15,7 +15,7 @@ $ python ./log_model.py
 Note the id of the run that was generated from the run of log_model.py in step (1) above. Suppose it is 0-351e1a1e91334d9ca5cb704b0792d9b3, then the following command serves that model
 
 ```
-$ mlflow models serve -m runs:/0-351e1a1e91334d9ca5cb704b0792d9b3/model --no-conda
+$ mlflow models serve -m runs:/0-351e1a1e91334d9ca5cb704b0792d9b3/model
 ```
 
 ## 3. Input:

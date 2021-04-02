@@ -5,6 +5,7 @@ import mlflow
 from mlflow import log_artifact
 from mlflow.models import ModelSignature
 import json
+import subprocess
 
 # Example invocation:
 # curl -X POST -H "Content-Type:application/json; format=pandas-split"
@@ -28,14 +29,20 @@ class SentimentAnalysis(mlflow.pyfunc.PythonModel):
         model_input[['label', 'score']] = model_input.apply(self.do_nlp_fnx, axis=1, result_type='expand')
         return model_input
 
-# construct and log model
+# capture conda environment
+retval = os.system("conda env export -f conda.yaml")
+if (retval != 0):
+    print('Error ' + str(retval) + ' capturing conda env')
+    exit()
 
+# define mode signature
 inp = json.dumps([{'name': 'text', 'type': 'string'}])
 outp = json.dumps([{'name': 'text', 'type':'string'}, {'name': 'label', 'type':'string'}, {'name': 'score', 'type': 'double'}])
 signature = ModelSignature.from_dict({'inputs': inp, 'outputs': outp})
 
+# construct and log model
 with mlflow.start_run():
     mlflow.pyfunc.log_model('model', loader_module=None, data_path=None, code_path=None,\
-                            conda_env=None, python_model=SentimentAnalysis(),\
+                            conda_env='./conda.yaml', python_model=SentimentAnalysis(),\
                             artifacts=None, registered_model_name=None, signature=signature,\
                             input_example=None, await_registration_for=0)
